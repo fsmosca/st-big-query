@@ -28,6 +28,11 @@ def run_query(query):
     return rows
 
 
+@st.cache_data(ttl=600)
+def pandas_query(query):
+    return pandas_gbq.read_gbq(query, credentials=credentials)
+
+
 if __name__ == '__main__':
     st.subheader('Streamlit Google Bigquery Example')
     st.write('Query word from google\'s shakespeare data')
@@ -47,6 +52,6 @@ if __name__ == '__main__':
             for row in rows:
                 st.write("✍️ " + row['word'])
         else:
-            df = pandas_gbq.read_gbq(query_statement, credentials=credentials)
+            df = pandas_query(query_statement)
             st.dataframe(df)       
             
