@@ -7,6 +7,7 @@ Reference:
 import streamlit as st
 from google.oauth2 import service_account
 from google.cloud import bigquery
+import pandas_gbq
 
 
 # Create API client.
@@ -31,11 +32,21 @@ if __name__ == '__main__':
     st.subheader('Streamlit Google Bigquery Example')
     st.write('Query word from google\'s shakespeare data')
 
-    is_query = st.button('Query')
-    if is_query:
-        rows = run_query("SELECT word FROM `bigquery-public-data.samples.shakespeare` LIMIT 10")
+    sel = st.radio("Select option", ['run_query', 'pandas'])
 
-        # Print results.
-        st.write("Some wise words from Shakespeare:")
-        for row in rows:
-            st.write("✍️ " + row['word'])
+    is_query = st.button('Query')
+    
+    if is_query:
+        query_statement = "SELECT word FROM `bigquery-public-data.samples.shakespeare` LIMIT 10"
+
+        if sel == 'run_query':
+            rows = run_query(query_statement)
+
+            # Print results.
+            st.write("Some wise words from Shakespeare:")
+            for row in rows:
+                st.write("✍️ " + row['word'])
+        else:
+            df = pandas_gbq.read_gbq(query_statement, credentials=credentials)
+            st.dataframe(df)       
+            
